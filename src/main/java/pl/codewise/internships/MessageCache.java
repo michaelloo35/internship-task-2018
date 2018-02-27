@@ -32,10 +32,11 @@ public class MessageCache {
      */
     public List<Message> viewHottestMessages(final int count) {
 
-        AtomicReference<Map<UniqueID, Message>> result = null;
+        AtomicReference<Map<UniqueID, Message>> result = new AtomicReference<>();
         cache.policy().eviction().ifPresent(eviction -> result.set(eviction.hottest(count)));
-        if (result != null)
-            return new ArrayList<Message>(result.get().values());
+
+        if (result.get() != null)
+            return new ArrayList<>(result.get().values());
         return null;
     }
 
