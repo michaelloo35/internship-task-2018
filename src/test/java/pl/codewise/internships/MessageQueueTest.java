@@ -24,7 +24,6 @@ public class MessageQueueTest {
         }
 
         // when
-        //
         Thread.sleep(3000);
 
         // then
@@ -72,7 +71,6 @@ public class MessageQueueTest {
         });
 
         // when
-
         thread1.run();
         thread2.run();
 
@@ -109,4 +107,48 @@ public class MessageQueueTest {
 
     }
 
+    @Test
+    public void shouldEvictHalfMessages() throws InterruptedException {
+
+        // given
+        Thread thread1 = new Thread(() -> {
+            for (int i = 0; i < 20; i++) messageQue.add(new Message("userAgent" + i, i));
+        });
+
+        Thread.sleep(1000);
+
+        Thread thread2 = new Thread(() -> {
+            for (int i = 0; i < 20; i++) messageQue.add(new Message("userAgent" + i, i));
+        });
+
+
+        // when
+        Thread.sleep(1500);
+
+        // then
+        assertEquals(20, messageQue.snapshot().getSnapshot().size());
+
+    }
+
+    @Test
+    public void shouldEvictHalfMessagesConcurrent() throws InterruptedException {
+
+        // given
+        for (int i = 0; i < 40; i++) {
+            messageQue.add(new Message("userAgent" + i, (i % 412) + 100));
+        }
+
+        Thread.sleep(1000);
+
+        for (int i = 0; i < 40; i++) {
+            messageQue.add(new Message("userAgent" + i, (i % 412) + 100));
+        }
+
+        // when
+        Thread.sleep(1500);
+
+        // then
+        assertEquals(40, messageQue.snapshot().getSnapshot().size());
+
+    }
 }
